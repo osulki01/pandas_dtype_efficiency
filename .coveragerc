@@ -1,5 +1,5 @@
 [html]
-directory = test_coverage_html_report
+directory = .test_coverage_html_report
 
 [report]
 omit =
