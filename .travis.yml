@@ -1,0 +1,30 @@
+language: generic
+
+services:
+  - docker
+
+env:
+  global:
+    - DOCKER_COMPOSE_VERSION=1.27.4
+
+before_install:
+  # Use same version of docker-compose as local machine
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose --version
+  # Set up images and container
+  - docker-compose build
+  - docker-compose up -d
+  # Check service is running
+  - docker ps -a
+
+script:
+  # Run tests
+  - docker exec pandas_dtype_efficiency_dev /home/docker_user/.local/bin/pytest --verbose tests/
+  # Check code quality
+  - docker exec pandas_dtype_efficiency_dev /home/docker_user/.local/bin/flake8 pandas_dtype_efficiency.py --max-line-length 120
+
+after_script:
+  - docker-compose down
