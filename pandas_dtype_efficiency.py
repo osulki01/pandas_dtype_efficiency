@@ -37,7 +37,7 @@ class DataFrameChecker:
         self._columns_by_type = self._separate_dtypes()
 
         if float_size not in [16, 32, 64]:
-            raise ValueError('float_precision must correspond to a numpy.float (one of 16, 32, or 64)')
+            raise ValueError('float_size must correspond to a numpy.float (one of 16, 32, or 64)')
         self._float_size = float_size
 
     def cast_dataframe_to_lower_memory_version(self) -> Union[pd.DataFrame, None]:
@@ -54,11 +54,11 @@ class DataFrameChecker:
         if not self._dataframe_has_been_analysed:
             raise UserWarning(
                 'DataFrame has not been analysed for improvements yet. Run `identify_possible_improvements` method '
-                'first. '
+                'first.'
             )
 
         if not self._all_possible_improvements:
-            raise UserWarning('No improvements have been found after analysing DataFrame.')
+            raise UserWarning('No possible improvements have been found after analysing DataFrame.')
 
         lower_memory_df = self._df.astype(dtype=self._all_possible_improvements)
 
@@ -181,7 +181,7 @@ class DataFrameChecker:
         -------
         dict
             Any columns with the potential for reduced memory, and the dtype that can be used to represent them in a
-            more efficient manner.
+            more efficient manner. Dictionary is empty if no possible improvements founds.
         """
 
         return self._all_possible_improvements

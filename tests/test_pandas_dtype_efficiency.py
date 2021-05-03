@@ -6,6 +6,7 @@ import pytest
 # Internal imports
 import pandas_dtype_efficiency as pd_eff
 
+
 # Mock data for consistent evaluation
 MOCK_DF = pd.DataFrame(
     data={
@@ -19,6 +20,10 @@ MOCK_DF = pd.DataFrame(
         'ineligible_column': [True, False, True, False, True, False, True, False, True, False]
     }
 )
+
+
+# Mock data where no improvements can be made
+MOCK_DF_NO_IMPROVEMENTS = pd.DataFrame(data={'bool_1': [True, False], 'bool_2': [True, False]})
 
 
 @pytest.fixture
@@ -58,6 +63,32 @@ class TestDataFrameChecker:
         lower_memory_df_dtypes = lower_memory_df.dtypes
 
         pd.testing.assert_series_equal(left=lower_memory_df_dtypes, right=expected_output)
+
+    def test_cast_dataframe_to_lower_memory_version_should_be_analysed_first(self, checker):
+        """
+        Warning is given if user tries to cast the DataFrame without having first evaluated it.
+        """
+
+        with pytest.raises(
+                expected_exception=UserWarning,
+                match='DataFrame has not been analysed for improvements yet. Run `identify_possible_improvements` '
+                      'method first.*'
+        ):
+            checker.cast_dataframe_to_lower_memory_version()
+
+    def test_cast_dataframe_to_lower_memory_version_warns_if_no_improvements(self):
+        """
+        Warning is given if DataFrame has no possible improvements.
+        """
+
+        checker = pd_eff.DataFrameChecker(df=MOCK_DF_NO_IMPROVEMENTS)
+        checker.identify_possible_improvements()
+
+        with pytest.raises(
+                expected_exception=UserWarning,
+                match='No possible improvements have been found after analysing DataFrame.*'
+        ):
+            checker.cast_dataframe_to_lower_memory_version()
 
     def test__check_if_integer_sizes_can_be_reduced(self, checker):
         """
@@ -121,6 +152,17 @@ class TestDataFrameChecker:
         }
 
         assert checker.get_possible_dtypes() == expected_output
+
+    def test__init_expects_valid_float_size(self):
+        """
+        The checker will not be created if an invalid float size is provided.
+        """
+
+        with pytest.raises(
+                expected_exception=ValueError,
+                match='float_size must correspond to a numpy.float (one of 16, 32, or 64)*'
+        ):
+            checker = pd_eff.DataFrameChecker(df=MOCK_DF, float_size=99)
 
     def test__separate_dtypes(self, checker):
         """
