@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  pandas_dtype_efficiency_dev:
+    build: .
+    container_name: pandas_dtype_efficiency_dev
+    volumes:
+      - ./:/usr/src/app

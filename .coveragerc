@@ -1,0 +1,18 @@
+[html]
+directory = test_coverage_html_report
+
+[report]
+omit =
+    # Anything in a .local directory
+    */.local/*
+    # Setup and regular package files
+    **/setup.py
+    **/__init__.py
+
+[run]
+omit =
+    # Anything in a .local directory
+    */.local/*
+    # Setup and regular package files
+    **/setup.py
+    **/__init__.py
