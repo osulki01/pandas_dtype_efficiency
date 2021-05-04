@@ -1,5 +1,16 @@
 # pandas_dtype_efficiency
 
+- [About](#About)
+- [Installation](#installation)
+- [Example Usage](#example-usage)
+  * [Watch-outs](#watch-outs)
+- [Contributing](#contributing)
+  * [Development environment](#development-environment)
+- [License](#license)
+
+
+## About
+
 pandas_dtype_efficiency is a Python package to help reduce the memory size of pandas DataFrames without changing the 
 underlying data (lossless compression). It is intended to make your code more efficient and reduce the likelihood of 
 running out of memory.
@@ -43,14 +54,90 @@ pip install git+http://github.com/osulki01/pandas_dtype_efficiency#egg=pandas_dt
 
 ## Example Usage
 
+First, let's create a pandas DataFrame made up of various data types. All of the code in this section is Python.
+
+```python
+import numpy as np
+import pandas as pd
+
+num_rows = 100000
+
+df_original = pd.DataFrame(
+    data={
+        'small_integers': np.random.randint(low=-128, high=128, size=num_rows),
+        'medium_integers': np.random.randint(low=-32768, high=32768, size=num_rows),
+        'large_integers': np.random.randint(low=-9223372036854775808, high=9223372036854775808, size=num_rows),
+        'floats': np.random.rand(size=num_rows),
+        'categorical_strings': np.random.choice(a=['Cat_1', 'Cat_2', 'Cat_3'], size=num_rows),
+        'bools': np.random.choice(a=[True, False], size=num_rows)
+    }
+)
+```
+
+Next, we create a DataFrameChecker that can analyse the DataFrame for potential memory improvements.
+
+The optional arguments are:
+
+* **categorical_threshold**; the maximum number of distinct values in a column of strings to suggest transforming it into 
+a categorical column. In this case, if a column made up of strings has less than or equal to 10 distinct values, it 
+will be flagged as a potential [categorical](https://pandas.pydata.org/pandas-docs/stable/user_guide/categorical.html) 
+column.
+* **float_size**; the desired numpy float type; 16: numpy float16, 32: numpy float23, 64: numpy float64 
+(the pandas default). If this argument is set to 64, then float columns are not analysed. If you do not need decimals 
+stored to the level of precision in the pandas default of numpy.float64, then make use of this compression.
+
+```python
+import pandas_dtype_efficiency as pd_eff
+
+checker = pd_eff.DataFrameChecker(
+    df=df_original,
+    categorical_threshold=10,  # Optional argument
+    float_size=16  # Optional argument
+)
+```
+
+The checker can then be used to evaluate the DataFrame and find any columns with potential for reduced memory:
+
+```python
+# Analyse DataFrame
+checker.identify_possible_improvements()
+
+# Retrieve the suggested dtypes for columns where their memory footprint could be reduced
+# If no improvements are found, this will return an empty dictionary
+potential_improvements = checker.get_possible_dtypes()
+```
+
+The suggested improvements can be used to produce a new DataFrame with reduced memory usage:
+
+```python
+df_reduced_memory = checker.cast_dataframe_to_lower_memory_version()
+
+# The checker will tell you how much memory has been saved overall but you can view this at a column level too
+df_original.memory_usage(deep=True)
+df_reduced_memory.memory_usage(deep=True)
+```
+
+The potential improvements indicated by checker.get_possible_dtypes() can also used at the point of reading in 
+data from a local file rather than loading it all into memory and then transforming the data.
+
+```python
+df_reduced_memory_on_load = pd.read_csv('my_data.csv', dtype=potential_improvements)
+```
 
 
 ### Watch-outs
 
+1. If you are preparing data for a machine learning algorithm, the machine learning library may cast the data to fixed 
+data type regardless of how it has been provided, so this exercise would redundant in these cases if the next step will
+undo the compression performed.
+2. The method cast_dataframe_to_lower_memory_version creates a whole new DataFrame rather than updating the existing 
+one (to avoid unwanted mutation). If your DataFrame is already close to the memory limit for your machine then you 
+could run out of memory by having two large DataFrames, even if one of them has been compressed.
 
 ## Contributing
 
-Any suggestions or contributions are welcome via emails or pull requests.
+Any suggestions or contributions are welcome via emails or pull requests (my email address is listed 
+within [setup.py](setup.py)).
 
 
 ### Development environment
@@ -70,6 +157,6 @@ docker exec pandas_dtype_efficiency_dev pytest --verbose tests/
 ```
 
 
-## Meta
+## License
 
 Distributed under the MIT License. See [LICENSE.txt](LICENSE.txt) for more information.
