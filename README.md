@@ -24,7 +24,7 @@ be accommodated with a numpy.int8
 * String values which fall within a small list of set values and could be represented by the pandas.Categorical data 
 type instead
 
-![Demo](Demo.gif)
+![Demo](https://github.com/osulki01/pandas_dtype_efficiency/blob/main/Demo.gif?raw=true)
 
 
 ## Installation
