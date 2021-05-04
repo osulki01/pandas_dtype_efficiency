@@ -136,8 +136,7 @@ could run out of memory by having two large DataFrames, even if one of them has 
 
 ## Contributing
 
-Any suggestions or contributions are welcome via emails or pull requests (my email address is listed 
-within [setup.py](setup.py)).
+Any suggestions or contributions are welcome via email or pull request.
 
 
 ### Development environment
@@ -156,7 +155,3 @@ docker-compose up -d
 docker exec pandas_dtype_efficiency_dev pytest --verbose tests/
 ```
 
-
-## License
-
-Distributed under the MIT License. See [LICENSE.txt](LICENSE.txt) for more information.
