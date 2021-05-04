@@ -65,8 +65,8 @@ class DataFrameChecker:
         original_df_memory_size_bytes = self._df.memory_usage(deep=True).sum()
         new_df_memory_size_bytes = lower_memory_df.memory_usage(deep=True).sum()
 
-        print(f'Original DataFrame memory: {(original_df_memory_size_bytes / 1024):,} megabytes')
-        print(f'New DataFrame memory: {(new_df_memory_size_bytes / 1024):,} megabytes')
+        print(f'Original DataFrame memory: {(original_df_memory_size_bytes / 1024):,.2f} megabytes')
+        print(f'New DataFrame memory: {(new_df_memory_size_bytes / 1024):,.2f} megabytes')
         return lower_memory_df
 
     def _check_if_integer_sizes_can_be_reduced(self) -> Dict[str, type]:
@@ -167,8 +167,7 @@ class DataFrameChecker:
             return possible_improvements
 
         for col in float_columns:
-            if self._df[col].nunique() <= self._categorical_threshold:
-                possible_improvements[col] = float_size_to_numpy_type[self._float_size]
+            possible_improvements[col] = float_size_to_numpy_type[self._float_size]
 
         return possible_improvements
 
@@ -188,23 +187,24 @@ class DataFrameChecker:
 
     def identify_possible_improvements(self) -> None:
         """
-        Analyse the dataframe and store a dictionary containing any column with the potential for reduced memory, and
+        Analyse the DataFrame and store a dictionary containing any column with the potential for reduced memory, and
         the dtype that can be used to represent it in a more efficient manner.
         """
 
-        print('Analysing any float columns')
+        print('Checking float columns if reduced precision requested')
         float_improvements = self._flag_float_column_improvements()
         self._all_possible_improvements.update(float_improvements)
 
-        print('Analysing any integer columns')
+        print('Checking integer columns to see whether a smaller size can be used')
         integer_improvements = self._check_if_integer_sizes_can_be_reduced()
         self._all_possible_improvements.update(integer_improvements)
 
-        print('Analysing any string columns')
+        print('Checking string columns to see if they be assigned to repeated categories')
         categorical_improvements = self._check_if_strings_could_be_categorical()
         self._all_possible_improvements.update(categorical_improvements)
 
         self._dataframe_has_been_analysed = True
+        print('Done')
 
     def _separate_dtypes(self) -> Dict[str, List[str]]:
         """
