@@ -16,6 +16,9 @@ RUN pip install --user --requirement requirements-dev.txt
 # Ensure the local namespace python packages can be imported and used from anywhere
 ENV PYTHONPATH="${PYTHONPATH}:${working_directory}"
 
+# Make packages like twine and pytest accessible from the path when running them from the command line
+ENV PATH="${PATH}:/home/${username}/.local/bin"
+
 # Make sure source code and tests are available
 COPY pandas_dtype_efficiency.py .
 COPY tests tests/
