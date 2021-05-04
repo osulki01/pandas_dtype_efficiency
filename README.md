@@ -6,7 +6,6 @@
   * [Watch-outs](#watch-outs)
 - [Contributing](#contributing)
   * [Development environment](#development-environment)
-- [License](#license)
 
 
 ## About
