@@ -12,4 +12,4 @@ echo "Check package description will render properly on PyPI"
 docker exec pandas_dtype_efficiency_dev twine check dist/* && \
 
 echo "Uploading to PyPI"
-docker exec pandas_dtype_efficiency_dev twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+docker exec -it pandas_dtype_efficiency_dev twine upload --repository-url https://test.pypi.org/legacy/ dist/*
