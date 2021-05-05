@@ -22,9 +22,9 @@ before_install:
 
 script:
   # Run tests
-  - docker exec pandas_dtype_efficiency_dev /home/docker_user/.local/bin/pytest --verbose tests/
+  - docker exec pandas_dtype_efficiency_dev pytest --verbose tests/
   # Check code quality
-  - docker exec pandas_dtype_efficiency_dev /home/docker_user/.local/bin/flake8 pandas_dtype_efficiency.py --max-line-length 120
+  - docker exec pandas_dtype_efficiency_dev flake8 pandas_dtype_efficiency.py --max-line-length 120
 
 after_script:
   - docker-compose down
