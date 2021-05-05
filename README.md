@@ -77,11 +77,11 @@ Next, we create a DataFrameChecker that can analyse the DataFrame for potential 
 
 The optional arguments are:
 
-* **categorical_threshold**; the maximum number of distinct values in a column of strings to suggest transforming it into 
-a categorical column. In this case, if a column made up of strings has less than or equal to 10 distinct values, it 
-will be flagged as a potential [categorical](https://pandas.pydata.org/pandas-docs/stable/user_guide/categorical.html) 
-column.
-* **float_size**; the desired numpy float type; 16: numpy float16, 32: numpy float23, 64: numpy float64 
+* **categorical_threshold**; the maximum number of distinct values in a string column to suggest transforming it into 
+a categorical data type. In the default case, if a column made up of strings has less than or equal to 10 distinct 
+values, it will be flagged as a potential 
+[categorical](https://pandas.pydata.org/pandas-docs/stable/user_guide/categorical.html) column.
+* **float_size**; the desired numpy float type where 16: numpy float16, 32: numpy float23, and 64: numpy float64 
 (the pandas default). If this argument is set to 64, then float columns are not analysed. If you do not need decimals 
 stored to the level of precision in the pandas default of numpy.float64, then make use of this compression.
 
@@ -106,7 +106,7 @@ checker.identify_possible_improvements()
 potential_improvements = checker.get_possible_dtypes()
 ```
 
-The suggested improvements can be used to produce a new DataFrame with reduced memory usage:
+The suggested improvements can be used to produce a new compressed version of the DataFrame:
 
 ```python
 df_reduced_memory = checker.cast_dataframe_to_lower_memory_version()
@@ -126,9 +126,8 @@ df_reduced_memory_on_load = pd.read_csv('my_data.csv', dtype=potential_improveme
 
 ### Watch-outs
 
-1. If you are preparing data for a machine learning algorithm, the machine learning library may cast the data to fixed 
-data type regardless of how it has been provided, so this exercise would redundant in these cases if the next step will
-undo the compression performed.
+1. If you are preparing data for a machine learning algorithm, the machine learning library may automatically cast the 
+data to fixed data type regardless of how it has been provided, so this exercise would be redundant in those cases.
 2. The method cast_dataframe_to_lower_memory_version creates a whole new DataFrame rather than updating the existing 
 one (to avoid unwanted mutation). If your DataFrame is already close to the memory limit for your machine then you 
 could run out of memory by having two large DataFrames, even if one of them has been compressed.
@@ -153,4 +152,3 @@ docker-compose up -d
 # Run tests to make sure code is functional
 docker exec pandas_dtype_efficiency_dev pytest --verbose tests/
 ```
-
