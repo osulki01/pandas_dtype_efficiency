@@ -226,3 +226,45 @@ class DataFrameChecker:
                 columns_by_dtype[data_type] = relevant_columns
 
         return columns_by_dtype
+    
+    
+    
+def lowmem(df: pd.DataFrame, categorical_threshold: int = 15, float_size: int = 16,verbose: bool =False):
+    """
+    Wrapper for dtype efficiency. Accepts identical arguments, with the addition of verbose.
+    Allows for one-line use. 
+    
+    checker = pd_eff.lowmem(pd.read_csv(..),
+                            categorical_threshold=10,  
+                            float_size=32,
+                            verbose=True)
+ 
+    Returns 
+    -------
+    pd.DataFrame
+        Low memory dataframe
+        
+    Parameters
+    ----------
+    df : pandas DataFrame
+        Data to be checked to see whether any columns could reduce their memory usage.
+    categorical_threshold : int (default 15)
+        The maximum number of distinct values in a column of strings to suggest transforming it into a categorical
+        column.
+    float_size : int (default 16)
+        The desired numpy float type; 16: numpy float16, 32: numpy float23, 64: numpy float64 (the pandas default).
+    verbose : bool (default False)
+        Print the dataframe sizes in Mb. 
+    """ 
+    # Just use the example given in the readme.
+    checker = DataFrameChecker(df=df,
+                               categorical_threshold=categorical_threshold,  # Optional argument
+                               float_size=float_size)                        # Optional argument
+    
+    checker.identify_possible_improvements()
+    low_mem=checker.cast_dataframe_to_lower_memory_version()    
+    if verbose==True:
+        df.memory_usage(deep=True)
+        low_mem.memory_usage(deep=True)
+    return low_mem
+
