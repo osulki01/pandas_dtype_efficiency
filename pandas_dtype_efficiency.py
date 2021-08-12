@@ -229,7 +229,7 @@ class DataFrameChecker:
     
     
     
-def lowmem(df: pd.DataFrame, categorical_threshold: int = 15, float_size: int = 16,verbose: bool =False):
+def lowmem(df: pd.DataFrame, categorical_threshold: int = 15, float_size: int = 32,verbose: bool =False):
     """
     Wrapper for dtype efficiency. Accepts identical arguments, with the addition of verbose.
     Allows for one-line use. 
@@ -259,12 +259,27 @@ def lowmem(df: pd.DataFrame, categorical_threshold: int = 15, float_size: int = 
     # Just use the example given in the readme.
     checker = DataFrameChecker(df=df,
                                categorical_threshold=categorical_threshold,  # Optional argument
-                               float_size=float_size)                        # Optional argument
-    
+                               float_size=float_size,
+                               verbose=verbose)                        # Optional argument
+    # Possible to add verbose comments into the following functions to make this truly silent.
     checker.identify_possible_improvements()
     low_mem=checker.cast_dataframe_to_lower_memory_version()    
     if verbose==True:
         df.memory_usage(deep=True)
         low_mem.memory_usage(deep=True)
     return low_mem
-
+    
+    
+def read_csv(file_path : str, categorical_threshold: int = 15, float_size: int = 32,verbose: bool =False,deep:bool=True,**kwargs):
+    """
+    Simplest wrapper for Pandas Efficiency.
+    One liner to load and read files. 
+    Takes file_path as the first Arg, followed by same defaults as pd_eff. Also accepts any Pandas arguments.
+    
+    `import pandas_dtype_efficiency as pd_eff`
+    `pd_eff.read_csv('yourfilepath.csv',sep=',',index=[0]')`
+    """
+    csv=pd.read_csv(file_path,low_memory=False,**kwargs)
+    low_mem_output=lowmem(csv,categorical_threshold,float_size,verbose)
+    if deep: low_mem_output=low_mem_output.copy(deep=True)
+    return low_mem_output
