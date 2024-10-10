@@ -65,8 +65,8 @@ class DataFrameChecker:
         original_df_memory_size_bytes = self._df.memory_usage(deep=True).sum()
         new_df_memory_size_bytes = lower_memory_df.memory_usage(deep=True).sum()
 
-        print(f'Original DataFrame memory: {(original_df_memory_size_bytes / 1024):,.2f} megabytes')
-        print(f'New DataFrame memory: {(new_df_memory_size_bytes / 1024):,.2f} megabytes')
+        print(f'Original DataFrame memory: {(original_df_memory_size_bytes / 1_048_576):,.2f} megabytes')
+        print(f'New DataFrame memory: {(new_df_memory_size_bytes / 1_048_576):,.2f} megabytes')
         return lower_memory_df
 
     def _check_if_integer_sizes_can_be_reduced(self) -> Dict[str, type]:
